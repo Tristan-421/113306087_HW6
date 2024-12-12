@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>113306087_HW6_1A2B</title>
+    <link rel="stylesheet" href="113306087_HW6.css">
+</head>
+<body>
+    <h1>113306087_HW6_1A2B</h1>
+    <p>猜四個不重複的數字：</p>
+    <input type="text" id="guessInput" maxlength="4" placeholder="輸入4位數字">
+    <button onclick="checkAnswer()">提交答案</button>
+    <div class="results">
+        <h3>作答記錄：</h3>
+        <ul id="guessHistory"></ul>
+    </div>
+
+    <script>
+        let secret = generateSecret();
+        let attempts = 0;
+
+        function generateSecret() {
+            let numbers = Array.from({length: 10}, (_, i) => i);
+            let secretArray = [];
+            while (secretArray.length < 4) {
+                const index = Math.floor(Math.random() * numbers.length);
+                secretArray.push(numbers[index]);
+                numbers.splice(index, 1);
+            }
+            return secretArray;
+        }
+
+        function checkAnswer() {
+            const guessInput = document.getElementById("guessInput");
+            const guess = guessInput.value;
+            guessInput.value = "";
+
+            if (!isValidGuess(guess)) {
+                alert("請輸入4個不重複的數字！");
+                return;
+            }
+
+            attempts++;
+            const feedback = getFeedback(guess.split("").map(Number));
+            const guessHistory = document.getElementById("guessHistory");
+
+            const listItem = document.createElement("li");
+            listItem.textContent = `猜測：${guess} => ${feedback}`;
+            guessHistory.appendChild(listItem);
+
+            if (feedback === "4A0B") {
+                alert(`恭喜答對！總共作答 ${attempts} 次。`);
+                resetGame();
+            }
+        }
+
+        function isValidGuess(guess) {
+            if (guess.length !== 4 || isNaN(guess)) return false;
+            const digits = guess.split("");
+            return new Set(digits).size === 4;
+        }
+
+        function getFeedback(guessArray) {
+            let A = 0, B = 0;
+            guessArray.forEach((digit, index) => {
+                if (digit === secret[index]) {
+                    A++;
+                } else if (secret.includes(digit)) {
+                    B++;
+                }
+            });
+            return `${A}A${B}B`;
+        }
+
+        function resetGame() {
+            secret = generateSecret();
+            attempts = 0;
+            document.getElementById("guessHistory").innerHTML = "";
+        }
+    </script>
+</body>
+</html>
+
